@@ -1,6 +1,6 @@
 
 /*
-    Gui Style
+    Helper Gui
 */
 
 #Include lib\SB.ahk
@@ -28,6 +28,7 @@ Gui, Font,, Arial
 Gui, Font,, Open Sans ; Preferred font.
 Gui, Font,, Muli ; Preferred font.
 
+Menu, Tray, Icon,       resources\icon.ico, 1, 1
 ; Menu Bar
 ;File
 Menu, FileMenu, Add,    Reload`tCtrl+R,Reload

@@ -1,9 +1,5 @@
 ﻿/*
-    Todo: 
-    1 - Check for identical keys (Done)
-    2 - Exclude folders/files
-    3 - This line is a bit bugged : MsgBox,,    % "#1", % Trnslate("Basic") " test"
-    4 - Replace section title "Strings" by the name of the file
+    Helper main file
 */
 
 #NoEnv
@@ -89,6 +85,7 @@ IsAlreadyInList(currentKey)
     return False
 }
 
+;To be revised
 LoadGuiContent(index)
 {
     SetProgress(index, _NbKeys)
@@ -119,6 +116,7 @@ LoadGuiContent(index)
     }
 }
 
+;To be revised
 RetrieveTranslation(Byref obj, key){
     IniRead, readValue, % obj.file, Strings, %key%, %A_Space%
     ;Check for multiline message
@@ -136,6 +134,7 @@ RetrieveTranslation(Byref obj, key){
     return translationValue
 }
 
+;To be revised
 AddTranslationToEditorInput(inputName, key, value)
 {
     GuiControl, Text, % inputName "Key", % "Key: " key "📋"
@@ -143,6 +142,7 @@ AddTranslationToEditorInput(inputName, key, value)
     Gui, Submit, NoHide
 }
 
+;To be revised
 ParseLineForTranslateCall(line)
 {
     local keys := []
@@ -165,6 +165,7 @@ CheckForModifications()
     Return True
 }
 
+;To be revised
 GetKeyCodeInClipboard:
     Gui, Submit, NoHide
     Clipboard := "Translate(""" _CurrentKeyName """)"
@@ -174,6 +175,7 @@ PreviewMaster:
     Gui, Submit, NoHide
     MsgBox, 32, Preview, %EditMasterTranslation%
     return
+
 PreviewCurrent:
     Gui, Submit, NoHide
     MsgBox, 32, Preview, %EditCurrentTranslation%
@@ -190,6 +192,7 @@ ToggleMasterModifications:
     Gui, Font, Normal
     _MasterModifications := !_MasterModifications
     return
+
 ToggleCurrentModifications:
     Gui, Submit, NoHide
     If _CurrentModifications
@@ -202,12 +205,15 @@ ToggleCurrentModifications:
     _CurrentModifications := !_CurrentModifications
     return
 
+;To be revised
 LoadMasterTranslation:
     Gui, Submit, NoHide
     _MasterTranslation.file := _TranslationsFolder SelectMasterTranslation ".ini"
     Gosub, ParseSourceCode
     LoadGuiContent(_CurrentKey)
     return
+
+;To be revised
 LoadCurrentTranslation:
     Gui, Submit, NoHide
     _CurrentTranslation.file := _TranslationsFolder SelectCurrentTranslation ".ini"
@@ -245,6 +251,7 @@ PreviousKey:
             LoadGuiContent(--_CurrentKey)
     return
 
+;To be revised
 SaveMaster:
     Gui, Submit, NoHide
     Gui, Font, Normal s14
@@ -255,6 +262,7 @@ SaveMaster:
     IniWrite, %EditMasterTranslation%, % _MasterTranslation.file, Strings, % _CurrentKeyName
     return
 
+;To be revised
 SaveCurrent:
     Gui, Submit, NoHide
     Gui, Font, Normal s14
@@ -263,10 +271,6 @@ SaveCurrent:
     Gui, Font, Normal
     _CurrentModifications := False
     IniWrite, %EditCurrentTranslation%, % _CurrentTranslation.file, Strings, % _CurrentKeyName
-    return
-
-TestMsg:
-    MsgBox It's working chief!
     return
 
 VisitGitHub:

@@ -1,3 +1,8 @@
+/*
+    Demo file
+    Just run it (make sure you have cloned the whole repository)
+*/
+
 #NoEnv
 #SingleInstance, Force
 

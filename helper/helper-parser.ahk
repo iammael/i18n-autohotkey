@@ -1,8 +1,6 @@
 /*
-    Parser
-*/
+    Helper classes for parser
 
-/*
     Class Parser
         Properties:
             Array       Commands        -> List of all commands for a line
@@ -27,7 +25,6 @@ Class Parser {
 
     ParseLine(line){
         index := 1
-
         pos := 1
         Loop
         {
@@ -43,16 +40,9 @@ Class Parser {
                 index++
             }
         }
-        /*i := 1
-        Loop % this.Commands.MaxIndex()
-        {
-            For key, value in this.Commands[A_Index]
-                MsgBox,, % key " #" i, % value
-            i++
-        }
-        */
     }
 
+    ;To be revised (bug in todolist)
     ParseCall(ByRef cmd, pos)
     {
         openingBrackets := 0
@@ -75,6 +65,7 @@ Class Parser {
     }
 }
 
+;To be revised
 Class Command {
     FullLine := ""
     Args := []
@@ -89,7 +80,7 @@ Class Command {
             return this.stored_call
         }
         set { 
-            return this.stored_call := this.stored_call . value
+            return this.stored_call := this.stored_call . value ;char by char
         }
     }
 }

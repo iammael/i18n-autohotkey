@@ -1,13 +1,14 @@
 # Translation-AHK
 
-Manage translations in your AHK programs.
+A translation library for AutoHotKey programs.
 
 ## To Do
 
 ### Library
 
+- [ ] Make use of the same parser as the Helper
+- [ ] UTF-8
 - [ ] Clean code
-- [ ] Make use of the same parser as the helper
 
 ### Helper
 
@@ -16,4 +17,6 @@ Manage translations in your AHK programs.
 - [ ] Display full line of code
 - [ ] This line is a bit bugged : MsgBox,,  % "#1", % Translate("Basic") " test"
 - [ ] Replace sections in INI by the name of the file
+- [ ] UTF-8
+- [ ] Clean code
 
