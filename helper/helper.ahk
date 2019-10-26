@@ -1,4 +1,12 @@
-﻿#NoEnv
+﻿/*
+    Todo: 
+    1 - Check for identical keys (Done)
+    2 - Exclude folders/files
+    3 - This line is a bit bugged : MsgBox,,    % "#1", % Trnslate("Basic") " test"
+    4 - Replace section title "Strings" by the name of the file
+*/
+
+#NoEnv
 SendMode Input
 SetWorkingDir %A_ScriptDir%
 StringCaseSense On
@@ -6,31 +14,33 @@ StringCaseSense On
 #SingleInstance Force
 
 #Include helper-gui.ahk
+#Include helper-parser.ahk
 
 ; INI Settings
-Global TranslationsFolder := ""
-Global SourcesFolder := ""
+Global _TranslationsFolder := ""
+Global _SourcesFolder := ""
 PathIniSettings := "helper-settings.ini"
-IniRead, TranslationsFolder, %PathIniSettings%, Path, Translations
-IniRead, SourcesFolder, %PathIniSettings%, Path, Sources
+IniRead, _TranslationsFolder, %PathIniSettings%, Path, Translations
+IniRead, _SourcesFolder, %PathIniSettings%, Path, Sources
 IniRead, defaultMaster, %PathIniSettings%, Default, Master
 IniRead, defaultCurrent, %PathIniSettings%, Default, Current
 
 ; Globals
-Global MasterTranslation := New Translation(translationsFolder . "en-US.ini")
-Global CurrentTranslation := New Translation()
-Global NbKeys := 0
-Global CurrentKey := 1
-Global CurrentKeyName := ""
-Global MasterModifications = False
-Global CurrentModifications = False
+Global _MasterTranslation := New Translation(_TranslationsFolder . "en-US.ini")
+Global _CurrentTranslation := New Translation()
+Global _NbKeys := 0
+Global _CurrentKey := 1
+Global _CurrentKeyName := ""
+Global _MasterModifications = False
+Global _CurrentModifications = False
 
 ; Main
 GoSub, LoadGuiSettings
-CurrentTranslation.file := translationsFolder . SelectCurrentTranslation ".ini"
+_CurrentTranslation.file := _TranslationsFolder . SelectCurrentTranslation ".ini"
 Gosub, ParseSourceCode
-NbKeys := MasterTranslation.translations.MaxIndex()
-LoadGuiContent(CurrentKey)
+
+_NbKeys := _MasterTranslation.translations.MaxIndex()
+LoadGuiContent(_CurrentKey)
 
 return ; End of main
 
@@ -41,24 +51,26 @@ Class Translation {
     __New(file := "") 
     {
         this.file := file
-        
-
     }
 }
 
 ParseSourceCode:
     i := 1
-    Loop Files, %SourcesFolder%*.ahk, R
+    Loop Files, %_SourcesFolder%*.ahk, R
     {
-        If (InStr(A_LoopFileFullPath, "Tools\") || InStr(A_LoopFileFullPath, "Resources\") || InStr(A_LoopFileFullPath, "i18n"))
+        If (InStr(A_LoopFileFullPath, "Tools\") || InStr(A_LoopFileFullPath, "Resources\") || InStr(A_LoopFileFullPath, "i18n")) ; Todo #2
             Continue
         Loop, Read, %A_LoopFileFullPath%
         {
-            keys := ParseLineForTranslateCall(A_LoopReadLine)
-            Loop % keys.MaxIndex()
+            Parser := New Parser()
+            Parser.ParseLine(A_LoopReadLine)
+            Loop % Parser.Commands.MaxIndex()
             {
-                MasterTranslation.translations[i] := Object(keys[A_Index], RetrieveTranslation(MasterTranslation, keys[A_Index]))
-                CurrentTranslation.translations[i++] := Object(keys[A_Index], RetrieveTranslation(CurrentTranslation, keys[A_Index]))
+                currentKey := Parser.Commands[A_Index].Key
+                If IsAlreadyInList(currentKey)
+                    break
+                _MasterTranslation.translations[i] := Object(currentKey, RetrieveTranslation(_MasterTranslation, currentKey))
+                _CurrentTranslation.translations[i++] := Object(currentKey, RetrieveTranslation(_CurrentTranslation, currentKey))
             }
         }
     }
@@ -68,40 +80,43 @@ ParseSourceCode:
     FUNCTIONS 
 */
 
+IsAlreadyInList(currentKey)
+{
+    Loop, % _MasterTranslation.translations.MaxIndex()
+        For key, value in _MasterTranslation.translations[A_Index]
+            If (key = currentKey)
+                return True
+    return False
+}
+
 LoadGuiContent(index)
 {
-    SetProgress(index, NbKeys)
-    SetText("Step: " index "/" NbKeys)
+    SetProgress(index, _NbKeys)
+    SetText("Step: " index "/" _NbKeys)
     GuiControl, , SliderKey, %index%
-    GuiControl, +Range1-%NbKeys%, SliderKey
-    For key, value in MasterTranslation.translations[index]
+    GuiControl, +Range1-%_NbKeys%, SliderKey
+    For key, value in _MasterTranslation.translations[index]
     {
-        CurrentKeyName := key
+        _CurrentKeyName := key
         AddTranslationToEditorInput("MasterTranslation", key, value)
-        AddTranslationToEditorInput("CurrentTranslation", key, CurrentTranslation.translations[index][key])
+        AddTranslationToEditorInput("CurrentTranslation", key, _CurrentTranslation.translations[index][key])
     }
-    If (MasterModifications = True)
+    If (_MasterModifications = True)
     {
-        MasterModifications := !MasterModifications
+        _MasterModifications := !_MasterModifications
             Gui, Font, Normal s14
             GuiControl, Font, TextMasterTranslationTitle
             GuiControl,, TextMasterTranslationTitle, Master Translation
             Gui, Font, Normal
     }
-    If (CurrentModifications = True)
+    If (_CurrentModifications = True)
     {
-        CurrentModifications := !CurrentModifications
+        _CurrentModifications := !_CurrentModifications
             Gui, Font, Normal s14
             GuiControl, Font, TextCurrentTranslationTitle
             GuiControl,, TextCurrentTranslationTitle, Current Translation
             Gui, Font, Normal
     }
-}
-
-DebugTranslation(filename){
-    Loop % CurrentTranslation.translations.MaxIndex()
-        For index, value in CurrentTranslation.translations[A_Index]
-            MsgBox % "Item " index " is '" value "'"
 }
 
 RetrieveTranslation(Byref obj, key){
@@ -143,7 +158,7 @@ ParseLineForTranslateCall(line)
 
 CheckForModifications()
 {
-    If (MasterModifications || CurrentModifications)
+    If (_MasterModifications || _CurrentModifications)
         MsgBox, % 49+4096, Alert, % "You have some unsaved edits for this key. Press Ok to discard them."
     IfMsgBox, Cancel
         Return False
@@ -152,7 +167,7 @@ CheckForModifications()
 
 GetKeyCodeInClipboard:
     Gui, Submit, NoHide
-    Clipboard := "Translate(""" CurrentKeyName """)"
+    Clipboard := "Translate(""" _CurrentKeyName """)"
     return
 
 PreviewMaster:
@@ -166,43 +181,43 @@ PreviewCurrent:
 
 ToggleMasterModifications:
     Gui, Submit, NoHide
-    If MasterModifications
+    If _MasterModifications
         return
     GuiControlGet, title, , TextMasterTranslationTitle
     Gui, Font, Italic s14
     GuiControl, Font, TextMasterTranslationTitle
     GuiControl,, TextMasterTranslationTitle, %title%*
     Gui, Font, Normal
-    MasterModifications := !MasterModifications
+    _MasterModifications := !_MasterModifications
     return
 ToggleCurrentModifications:
     Gui, Submit, NoHide
-    If CurrentModifications
+    If _CurrentModifications
         return
     GuiControlGet, title, , TextCurrentTranslationTitle
     Gui, Font, Italic s14
     GuiControl, Font, TextCurrentTranslationTitle
     GuiControl,, TextCurrentTranslationTitle, %title%*
     Gui, Font, Normal
-    CurrentModifications := !CurrentModifications
+    _CurrentModifications := !_CurrentModifications
     return
 
 LoadMasterTranslation:
     Gui, Submit, NoHide
-    MasterTranslation.file := TranslationsFolder SelectMasterTranslation ".ini"
+    _MasterTranslation.file := _TranslationsFolder SelectMasterTranslation ".ini"
     Gosub, ParseSourceCode
-    LoadGuiContent(CurrentKey)
+    LoadGuiContent(_CurrentKey)
     return
 LoadCurrentTranslation:
     Gui, Submit, NoHide
-    CurrentTranslation.file := TranslationsFolder SelectCurrentTranslation ".ini"
+    _CurrentTranslation.file := _TranslationsFolder SelectCurrentTranslation ".ini"
     Gosub, ParseSourceCode
-    LoadGuiContent(CurrentKey)
+    LoadGuiContent(_CurrentKey)
     return
 
 LoadGuiSettings:
     translationsFiles := ""
-    Loop %translationsFolder%*.ini
+    Loop %_TranslationsFolder%*.ini
     {
         If (A_LoopFileName = "en-US.ini")
             Continue
@@ -219,15 +234,15 @@ SliderUpdateKey:
     return
 
 NextKey:
-    If (CurrentKey < NbKeys)
+    If (_CurrentKey < _NbKeys)
         If (CheckForModifications())
-            LoadGuiContent(++CurrentKey)
+            LoadGuiContent(++_CurrentKey)
     return
 
 PreviousKey:
-    If (CurrentKey > 1)
+    If (_CurrentKey > 1)
         If (CheckForModifications())
-            LoadGuiContent(--CurrentKey)
+            LoadGuiContent(--_CurrentKey)
     return
 
 SaveMaster:
@@ -236,8 +251,8 @@ SaveMaster:
     GuiControl, Font, TextMasterTranslationTitle
     GuiControl,, TextMasterTranslationTitle, Master Translation
     Gui, Font, Normal
-    MasterModifications := False
-    IniWrite, %EditMasterTranslation%, % MasterTranslation.file, Strings, % CurrentKeyName
+    _MasterModifications := False
+    IniWrite, %EditMasterTranslation%, % _MasterTranslation.file, Strings, % _CurrentKeyName
     return
 
 SaveCurrent:
@@ -246,16 +261,34 @@ SaveCurrent:
     GuiControl, Font, TextCurrentTranslationTitle
     GuiControl,, TextCurrentTranslationTitle, Current Translation
     Gui, Font, Normal
-    CurrentModifications := False
-    IniWrite, %EditCurrentTranslation%, % CurrentTranslation.file, Strings, % CurrentKeyName
+    _CurrentModifications := False
+    IniWrite, %EditCurrentTranslation%, % _CurrentTranslation.file, Strings, % _CurrentKeyName
     return
 
 TestMsg:
     MsgBox It's working chief!
     return
 
+VisitGitHub:
+    Run "https://github.com/iammael/Translation-AHK"
+    return
+
+; Shortcuts
+
+^R::
+Reload:
+    Reload
+    return
+
+^S::
+SaveCurrentKeys:
+    GoSub SaveMaster
+    GoSub SaveCurrent
+    return
+
 +F12::
 GuiClose:
+Quit:
     ExitApp
 
 /*

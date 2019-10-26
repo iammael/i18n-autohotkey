@@ -21,19 +21,24 @@ groupboxWidth := guiWidth
 ;Gui Settings
 Gui, -dpiscale
 Gui, Color, %cWhite%
-Gui -AlwaysOnTop +Resize
+Gui +Resize
 
 Gui, Font,, MS Sans Serif
 Gui, Font,, Arial
 Gui, Font,, Open Sans ; Preferred font.
 Gui, Font,, Muli ; Preferred font.
 
-Gui -AlwaysOnTop Resize
-
-;Menu Bar
+; Menu Bar
 ;File
-Menu, FileMenu, Add,    &Quit`tF12, TestMsg
-Menu, MyMenuBar, Add,   &File, :FileMenu
+Menu, FileMenu, Add,    Reload`tCtrl+R,Reload
+Menu, FileMenu, Add,    Save current keys`tCtrl+S,SaveCurrentKeys
+Menu, FileMenu, Add,    Quit`tShift+F12, Quit
+Menu, MyMenuBar, Add,   File, :FileMenu
+;About
+Menu, AboutMenu, Add,   Visit GitHub, VisitGitHub
+Menu, MyMenuBar, Add,   ?, :AboutMenu
+
+Gui, Menu,              MyMenuBar
 
 Gui, Font,              %cWhite% s10
 

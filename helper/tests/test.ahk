@@ -1,0 +1,1 @@
+MsgBox,     48, % "#4 " Translate("ComplexTitle", [GetVar("TitleApp")]), % Translate("Complex", [colors[1], colors[3]])
