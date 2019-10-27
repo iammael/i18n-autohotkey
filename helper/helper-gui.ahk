@@ -69,11 +69,11 @@ Gui, Font,              s14
 Gui, Add, Text,         y+10 xs+10 w%columnWidth% Center vTextMasterTranslationTitle, Master Translation
 Gui, Add, Text,         x+20 w%columnWidth% Center vTextCurrentTranslationTitle, Current Translation
 Gui, Font,              s10
-Gui, Add, Edit,         y+10 xs+10 r5 w%columnWidth% vEditMasterTranslation gToggleMasterModifications
-Gui, Add, Edit,         x+20 r5 w%columnWidth% vEditCurrentTranslation gToggleCurrentModifications
+Gui, Add, Edit,         y+10 xs+10 r5 w%columnWidth% vEditMasterTranslation gToggleModifications
+Gui, Add, Edit,         x+20 r5 w%columnWidth% vEditCurrentTranslation gToggleModifications
 
-Gui, Add, Button,       y+10 xs+10 w%columnWidth% Center gPreviewMaster, Preview
-Gui, Add, Button,       x+20 w%columnWidth% Center gPreviewCurrent, Preview
+Gui, Add, Button,       y+10 xs+10 w%columnWidth% Center vPreviewMaster, Preview
+Gui, Add, Button,       x+20 w%columnWidth% Center vPreviewCurrent, Preview
 Gui, Add, Button,       y+10 xs+10 w%columnWidth% Center gSaveMaster, Save
 Gui, Add, Button,       x+20 w%columnWidth% Center gSaveCurrent, Save
 

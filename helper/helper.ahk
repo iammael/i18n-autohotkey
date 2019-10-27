@@ -50,34 +50,8 @@ Class Translation {
     }
 }
 
-ParseSourceCode:
-    i := 1
-    IniRead, excludeStr, %PathIniSettings%, Path, Exclude, A_Space
-    excludeList := StrSplit(excludeStr, ",")
-    Loop Files, %_SourcesFolder%*.ahk, R
-    {
-        Loop % excludeList.MaxIndex()
-            If (InStr(A_LoopFileFullPath, excludeList[A_Index]))
-                isExcluded := True
-        If !isExcluded
-            Loop, Read, %A_LoopFileFullPath%
-            {
-                Parser := New Parser()
-                Parser.ParseLine(A_LoopReadLine)
-                Loop % Parser.Commands.MaxIndex()
-                {
-                    currentKey := Parser.Commands[A_Index].Key
-                    If IsAlreadyInList(currentKey)
-                        break
-                    _MasterTranslation.translations[i] := Object(currentKey, RetrieveTranslation(_MasterTranslation, currentKey))
-                    _CurrentTranslation.translations[i++] := Object(currentKey, RetrieveTranslation(_CurrentTranslation, currentKey))
-                }
-            }
-    }
-    return
-
 /* 
-    FUNCTIONS 
+    Functions
 */
 
 IsAlreadyInList(currentKey)
@@ -100,7 +74,7 @@ LoadGuiContent(index)
     {
         _CurrentKeyName := key
         AddTranslationToEditorInput("MasterTranslation", key, value)
-        AddTranslationToEditorInput("CurrentTranslation", key, _CurrentTranslation.translations[index][key])
+        break
     }
     If (_MasterModifications = True)
     {
@@ -169,55 +143,65 @@ CheckForModifications()
     Return True
 }
 
-;To be revised
-GetKeyCodeInClipboard:
-    Gui, Submit, NoHide
-    Clipboard := "Translate(""" _CurrentKeyName """)"
+RefreshData()
+{
+    i := 1
+    Loop, % _MasterTranslation.translations.MaxIndex()
+        For key, value in _MasterTranslation.translations[A_Index]
+            _MasterTranslation.translations[i++][key] := RetrieveTranslation(_MasterTranslation, key)
+}
+
+/*
+    Main labels
+*/
+
+ParseSourceCode:
+    i := 1
+    IniRead, excludeStr, %PathIniSettings%, Path, Exclude, A_Space
+    excludeList := StrSplit(excludeStr, ",")
+    Loop Files, %_SourcesFolder%*.ahk, R
+    {
+        Loop % excludeList.MaxIndex()
+            If (InStr(A_LoopFileFullPath, excludeList[A_Index]))
+                isExcluded := True
+        If !isExcluded
+            Loop, Read, %A_LoopFileFullPath%
+            {
+                Parser := New Parser()
+                Parser.ParseLine(A_LoopReadLine)
+                Loop % Parser.Commands.MaxIndex()
+                {
+                    currentKey := Parser.Commands[A_Index].Key
+                    If IsAlreadyInList(currentKey)
+                        break
+                    _MasterTranslation.translations[i] := Object(currentKey, RetrieveTranslation(_MasterTranslation, currentKey))
+                    _CurrentTranslation.translations[i++] := Object(currentKey, RetrieveTranslation(_CurrentTranslation, currentKey))
+                }
+            }
+    }
     return
 
-PreviewMaster:
+ToggleModifications:
     Gui, Submit, NoHide
-    MsgBox, 32, Preview, %EditMasterTranslation%
-    return
-
-PreviewCurrent:
-    Gui, Submit, NoHide
-    MsgBox, 32, Preview, %EditCurrentTranslation%
-    return
-
-ToggleMasterModifications:
-    Gui, Submit, NoHide
-    If _MasterModifications
+    id := (A_GuiControl = "EditMasterTranslation") ? "Master" : "Current"
+    If _%id%Modifications
         return
-    GuiControlGet, title, , TextMasterTranslationTitle
+    GuiControlGet, title, , Text%id%TranslationTitle
     Gui, Font, Italic s14
-    GuiControl, Font, TextMasterTranslationTitle
-    GuiControl,, TextMasterTranslationTitle, %title%*
+    GuiControl, Font, Text%id%TranslationTitle
+    GuiControl,, Text%id%TranslationTitle, %title%*
     Gui, Font, Normal
-    _MasterModifications := !_MasterModifications
+    _%id%Modifications := !_%id%Modifications
     return
 
-ToggleCurrentModifications:
-    Gui, Submit, NoHide
-    If _CurrentModifications
-        return
-    GuiControlGet, title, , TextCurrentTranslationTitle
-    Gui, Font, Italic s14
-    GuiControl, Font, TextCurrentTranslationTitle
-    GuiControl,, TextCurrentTranslationTitle, %title%*
-    Gui, Font, Normal
-    _CurrentModifications := !_CurrentModifications
-    return
-
-;To be revised
 LoadMasterTranslation:
     Gui, Submit, NoHide
     _MasterTranslation.file := _TranslationsFolder SelectMasterTranslation ".ini"
-    Gosub, ParseSourceCode
+    RefreshData()
+    ;Gosub, ParseSourceCode
     LoadGuiContent(_CurrentKey)
     return
 
-;To be revised
 LoadCurrentTranslation:
     Gui, Submit, NoHide
     _CurrentTranslation.file := _TranslationsFolder SelectCurrentTranslation ".ini"
@@ -236,6 +220,19 @@ LoadGuiSettings:
     GuiControl, , SelectMasterTranslation, % "|en-US||" translationsFiles
     GuiControl, , SelectCurrentTranslation, % "|" translationsFiles "|"
     Gui, Submit, NoHide
+    return
+
+/*
+    Gui controls
+*/
+
+GetKeyCodeInClipboard:
+    Gui, Submit, NoHide
+    Clipboard := "Translate(""" _CurrentKeyName """)"
+    return
+
+ButtonPreview:
+    MsgBox, 32, Preview, % (A_GuiControl = "PreviewMaster") ? EditMasterTranslation : EditCurrentTranslation
     return
 
 SliderUpdateKey:
@@ -281,7 +278,9 @@ VisitGitHub:
     Run "https://github.com/iammael/Translation-AHK"
     return
 
-; Shortcuts
+/*
+    Shortcuts
+*/
 
 #IfWinActive, ahk_Class AutoHotkeyGUI
 ^R::
