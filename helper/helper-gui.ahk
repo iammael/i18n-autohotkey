@@ -47,10 +47,10 @@ Gui, Font,              %cWhite% s10
 Gui, Add, GroupBox,     xm ym+10 y+10 Section w%groupboxWidth% h120, Settings
 Gui, Add, Text,         ys+30 xs+10 w80, Master
 Gui, Add, DropDownList, x+10 vSelectMasterTranslation, No translation files
-Gui, Add, Button,       x+10 gLoadMasterTranslation, Load
+Gui, Add, Button,       x+10 vLoadMaster gLoadTranslation, Load
 Gui, Add, Text,         y+10 xs+10 w80, Current
 Gui, Add, DropDownList, x+10 vSelectCurrentTranslation, No translation files
-Gui, Add, Button,       x+10 gLoadCurrentTranslation, Load
+Gui, Add, Button,       x+10 vLoadCurrent gLoadTranslation, Load
 ;Gui, Add, Button,       ys+100 xs+10 w80,Start
 
 ;Translation editor

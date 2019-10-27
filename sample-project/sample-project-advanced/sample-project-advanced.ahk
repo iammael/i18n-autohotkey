@@ -1,12 +1,11 @@
 /*
     Demo file
-    Just run it (make sure you have cloned the whole repository)
 */
 
 #NoEnv
 #SingleInstance, Force
 
-#Include ..\i18n.ahk
+#Include ..\lib\i18n.ahk
 
 Global i18nService := New i18n("i18n", "en-US", True)
 

@@ -1,5 +1,5 @@
 ﻿/*
-    Helper main file
+    Helper v1.0.0
 */
 
 #NoEnv
@@ -74,6 +74,7 @@ LoadGuiContent(index)
     {
         _CurrentKeyName := key
         AddTranslationToEditorInput("MasterTranslation", key, value)
+        AddTranslationToEditorInput("CurrentTranslation", key, _CurrentTranslation.translations[index][key])
         break
     }
     If (_MasterModifications = True)
@@ -143,12 +144,13 @@ CheckForModifications()
     Return True
 }
 
-RefreshData()
+RefreshData(id)
 {
+    obj := _%id%Translation
     i := 1
-    Loop, % _MasterTranslation.translations.MaxIndex()
-        For key, value in _MasterTranslation.translations[A_Index]
-            _MasterTranslation.translations[i++][key] := RetrieveTranslation(_MasterTranslation, key)
+    Loop, % obj.translations.MaxIndex()
+        For key, value in obj.translations[A_Index]
+            obj.translations[i++][key] := RetrieveTranslation(obj, key)
 }
 
 /*
@@ -194,18 +196,11 @@ ToggleModifications:
     _%id%Modifications := !_%id%Modifications
     return
 
-LoadMasterTranslation:
+LoadTranslation:
     Gui, Submit, NoHide
-    _MasterTranslation.file := _TranslationsFolder SelectMasterTranslation ".ini"
-    RefreshData()
-    ;Gosub, ParseSourceCode
-    LoadGuiContent(_CurrentKey)
-    return
-
-LoadCurrentTranslation:
-    Gui, Submit, NoHide
-    _CurrentTranslation.file := _TranslationsFolder SelectCurrentTranslation ".ini"
-    Gosub, ParseSourceCode
+    id := (A_GuiControl = "LoadMaster") ? "Master" : "Current"
+    _%id%Translation.file := _TranslationsFolder Select%id%Translation ".ini"
+    RefreshData(id)
     LoadGuiContent(_CurrentKey)
     return
 
@@ -261,6 +256,7 @@ SaveMaster:
     Gui, Font, Normal
     _MasterModifications := False
     IniWrite, %EditMasterTranslation%, % _MasterTranslation.file, Strings, % _CurrentKeyName
+    RefreshData("Master")
     return
 
 ;To be revised
@@ -272,6 +268,7 @@ SaveCurrent:
     Gui, Font, Normal
     _CurrentModifications := False
     IniWrite, %EditCurrentTranslation%, % _CurrentTranslation.file, Strings, % _CurrentKeyName
+    RefreshData("Current")
     return
 
 VisitGitHub:
