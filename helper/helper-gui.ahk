@@ -74,8 +74,8 @@ Gui, Add, Edit,         x+20 r5 w%columnWidth% vEditCurrentTranslation gToggleMo
 
 Gui, Add, Button,       y+10 xs+10 w%columnWidth% Center vPreviewMaster, Preview
 Gui, Add, Button,       x+20 w%columnWidth% Center vPreviewCurrent, Preview
-Gui, Add, Button,       y+10 xs+10 w%columnWidth% Center gSaveMaster, Save
-Gui, Add, Button,       x+20 w%columnWidth% Center gSaveCurrent, Save
+Gui, Add, Button,       y+10 xs+10 w%columnWidth% Center vSaveMaster, Save
+Gui, Add, Button,       x+20 w%columnWidth% Center vSaveCurrent, Save
 
 
 

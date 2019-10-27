@@ -116,7 +116,7 @@ RetrieveTranslation(Byref obj, key){
 ;To be revised
 AddTranslationToEditorInput(inputName, key, value)
 {
-    GuiControl, Text, % inputName "Key", % "Key: " key "📋"
+    GuiControl, Text, % inputName "Key", % "Key: " key
     GuiControl, , % "Edit" inputName , %value%
     Gui, Submit, NoHide
 }
@@ -151,6 +151,49 @@ RefreshData(id)
     Loop, % obj.translations.MaxIndex()
         For key, value in obj.translations[A_Index]
             obj.translations[i++][key] := RetrieveTranslation(obj, key)
+}
+
+DeleteKey(obj, keyName)
+{
+    
+    IniDelete, % obj.file, Strings, %keyName%
+    ;Multiline
+    i := 2
+    Loop {
+        IniRead, output, % obj.file, Strings, %keyName%%i%, %A_Space%
+        If !output
+            break
+        IniDelete, % obj.file, Strings, %keyName%%i%
+        i++
+    }
+}
+
+SaveTranslation(id)
+{
+    obj := _%id%Translation
+    input := Edit%id%Translation
+    value := StrSplit(input, "`n")
+
+    DeleteKey(obj, _CurrentKeyName)
+    IniWrite, % value[1], % obj.file, Strings, % _CurrentKeyName
+    
+    ;Write multiline
+    i := 2
+    Loop {
+        If !value[i]
+            break
+        IniWrite, % value[i], % obj.file, Strings, %_CurrentKeyName%%i%
+        i++
+    }
+
+    RefreshData(id)
+
+    ;Disable the modification state on the GUI
+    Gui, Font, Normal s14
+    GuiControl, Font, Text%id%TranslationTitle
+    GuiControl,, Text%id%TranslationTitle, %id% Translation
+    Gui, Font, Normal
+    _%id%Modifications := False
 }
 
 /*
@@ -248,28 +291,10 @@ PreviousKey:
             LoadGuiContent(--_CurrentKey)
     return
 
-;To be revised
-SaveMaster:
+ButtonSave:
     Gui, Submit, NoHide
-    Gui, Font, Normal s14
-    GuiControl, Font, TextMasterTranslationTitle
-    GuiControl,, TextMasterTranslationTitle, Master Translation
-    Gui, Font, Normal
-    _MasterModifications := False
-    IniWrite, %EditMasterTranslation%, % _MasterTranslation.file, Strings, % _CurrentKeyName
-    RefreshData("Master")
-    return
-
-;To be revised
-SaveCurrent:
-    Gui, Submit, NoHide
-    Gui, Font, Normal s14
-    GuiControl, Font, TextCurrentTranslationTitle
-    GuiControl,, TextCurrentTranslationTitle, Current Translation
-    Gui, Font, Normal
-    _CurrentModifications := False
-    IniWrite, %EditCurrentTranslation%, % _CurrentTranslation.file, Strings, % _CurrentKeyName
-    RefreshData("Current")
+    id := (A_GuiControl = "SaveMaster") ? "Master" : "Current"
+    SaveTranslation(id)
     return
 
 VisitGitHub:
@@ -288,8 +313,8 @@ Reload:
 
 ^S::
 SaveCurrentKeys:
-    GoSub SaveMaster
-    GoSub SaveCurrent
+    SaveTranslation("Master")
+    SaveTranslation("Current")
     return
 #IfWinActive
 
