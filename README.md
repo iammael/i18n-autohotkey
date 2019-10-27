@@ -1,18 +1,16 @@
-# Translation-AHK
+# i18n-autohotkey
 
-A translation library for AutoHotKey programs. 
+An internationalization and localization library for AutoHotKey programs. 
 
 There is also a program with a GUI to help you translate your projects.
 
 ## Table of contents
 
-<img align="right" width="40%" src="https://raw.githubusercontent.com/iammael/i18n-autohotkey/master/helper/resources/screenshot.png" alt="Retro Multi Manager GUI"/>
-
 * [Getting started](#getting-started)
   + [Instructions](#instructions)
   * [Sample project](#sample-project)
   * [Advanced sample project](#advanced-sample-project)
-* [Use the Helper](#use-the-helper)
+* [Translation Helper](#translation-helper)
 
 ## Getting started
 
@@ -121,7 +119,9 @@ F12::
     return
 ```
 
-## Use the Helper
+## Translation Helper
+
+<img align="center" width="60%" src="https://raw.githubusercontent.com/iammael/i18n-autohotkey/master/helper/resources/screenshot.png" alt="Translation Helper"/>
 
 To be written.
 
