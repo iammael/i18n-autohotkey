@@ -205,15 +205,16 @@ LoadTranslation:
     return
 
 LoadGuiSettings:
+    IniRead, defaultMaster, %PathIniSettings%, DefaultLanguage, Master, %A_Space%
+    IniRead, defaultCurrent, %PathIniSettings%, DefaultLanguage, Current, %A_Space%
+
     translationsFiles := ""
     Loop %_TranslationsFolder%*.ini
-    {
-        If (A_LoopFileName = "en-US.ini")
-            Continue
         translationsFiles := translationsFiles StrSplit(A_LoopFileName, .)[1] "|"
-    }
-    GuiControl, , SelectMasterTranslation, % "|en-US||" translationsFiles
-    GuiControl, , SelectCurrentTranslation, % "|" translationsFiles "|"
+    masterTranslationFiles := StrReplace(translationsFiles, defaultMaster, defaultMaster "|")
+    currentTranslationFiles := StrReplace(translationsFiles, defaultCurrent, defaultCurrent "|")
+    GuiControl, , SelectMasterTranslation, % "|" masterTranslationFiles
+    GuiControl, , SelectCurrentTranslation, % "|" currentTranslationFiles
     Gui, Submit, NoHide
     return
 
