@@ -27,7 +27,8 @@ Read the instructions or check the sample project below.
 
 - Declare a new global object **named i18nService**.
 
-  `Global i18nService := New i18n(LanguageFolder, LanguageFile)`
+  - `Global i18nService := New i18n(LanguageFolder, LanguageFile, [DevMode])`
+  - If *DevMode* is set to *True*, it will trigger some alerts for missing strings when you execute your program.
 
 - Whenever you want to internationalize a string, make a call to function Translate.
 
@@ -42,7 +43,7 @@ HelloWorld=Hello world!
 Greetings=Welcome in {1}.
 ```
 
-Here's an example of a working script featuring i18n (it will work given you have the fr-FR.ini file in your language folder):
+Here's an example of a working script featuring i18n (it will work given you have the associated fr-FR.ini file in your language folder):
 
 ```AutoHotKey
 #Include lib\i18n.ahk
@@ -51,15 +52,15 @@ MyAppName := "Sample Project"
 
 Global i18nService := New i18n("i18n", "en-US")
 
-MsgBox % Translate("HelloWord")
-MsgBox % Translate("Greetings")
+MsgBox % Translate("HelloWorld")
+MsgBox % Translate("Greetings", [MyAppName])
 
 ; You can dynamically change the language without reloading the program
 
 i18nService := New i18n("i18n", "fr-FR")
 
-MsgBox % Translate("HelloWord")
-MsgBox % Translate("Greetings")
+MsgBox % Translate("HelloWorld")
+MsgBox % Translate("Greetings", [MyAppName])
 ```
 
 You can download this sample project on the [releases page](https://github.com/iammael/i18n-autohotkey/releases).

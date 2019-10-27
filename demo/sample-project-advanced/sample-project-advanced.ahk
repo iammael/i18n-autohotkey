@@ -5,7 +5,7 @@
 #NoEnv
 #SingleInstance, Force
 
-#Include ..\lib\i18n.ahk
+#Include ..\..\i18n.ahk
 
 Global i18nService := New i18n("i18n", "en-US", True)
 
