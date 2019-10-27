@@ -52,23 +52,27 @@ Class Translation {
 
 ParseSourceCode:
     i := 1
+    IniRead, excludeStr, %PathIniSettings%, Path, Exclude, A_Space
+    excludeList := StrSplit(excludeStr, ",")
     Loop Files, %_SourcesFolder%*.ahk, R
     {
-        If (InStr(A_LoopFileFullPath, "Tools\") || InStr(A_LoopFileFullPath, "Resources\") || InStr(A_LoopFileFullPath, "i18n")) ; Todo #2
-            Continue
-        Loop, Read, %A_LoopFileFullPath%
-        {
-            Parser := New Parser()
-            Parser.ParseLine(A_LoopReadLine)
-            Loop % Parser.Commands.MaxIndex()
+        Loop % excludeList.MaxIndex()
+            If (InStr(A_LoopFileFullPath, excludeList[A_Index]))
+                isExcluded := True
+        If !isExcluded
+            Loop, Read, %A_LoopFileFullPath%
             {
-                currentKey := Parser.Commands[A_Index].Key
-                If IsAlreadyInList(currentKey)
-                    break
-                _MasterTranslation.translations[i] := Object(currentKey, RetrieveTranslation(_MasterTranslation, currentKey))
-                _CurrentTranslation.translations[i++] := Object(currentKey, RetrieveTranslation(_CurrentTranslation, currentKey))
+                Parser := New Parser()
+                Parser.ParseLine(A_LoopReadLine)
+                Loop % Parser.Commands.MaxIndex()
+                {
+                    currentKey := Parser.Commands[A_Index].Key
+                    If IsAlreadyInList(currentKey)
+                        break
+                    _MasterTranslation.translations[i] := Object(currentKey, RetrieveTranslation(_MasterTranslation, currentKey))
+                    _CurrentTranslation.translations[i++] := Object(currentKey, RetrieveTranslation(_CurrentTranslation, currentKey))
+                }
             }
-        }
     }
     return
 
@@ -279,6 +283,7 @@ VisitGitHub:
 
 ; Shortcuts
 
+#IfWinActive, ahk_Class AutoHotkeyGUI
 ^R::
 Reload:
     Reload
@@ -289,6 +294,7 @@ SaveCurrentKeys:
     GoSub SaveMaster
     GoSub SaveCurrent
     return
+#IfWinActive
 
 +F12::
 GuiClose:

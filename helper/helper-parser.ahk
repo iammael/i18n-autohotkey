@@ -1,5 +1,5 @@
 /*
-    Helper classes for parser
+    Parser for Translate calls in source code
 
     Class Parser
         Properties:
