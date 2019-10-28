@@ -4,15 +4,52 @@
 
 class Controller
 {
-    model := ""
-    view := ""
+    Model := ""
+    View := ""
 
-    __New( model, view)
+    CurrentKey := 1
+    CurrentKeyName := ""
+    MasterModifications := False
+    CurrentModifications := False
+
+    __New( Model, View)
     {
-        this.model := model
-        this.view  := view
-        this.view.AddListener(this)
+        this.Model := Model
+        this.View  := View
+        this.View.AddListener(this)
     }
+
+    LoadGuiContent(index)
+	{
+        NbKeys := this.Model.NbKeys
+
+		this.View.StatusBarSetProgress(index, NbKeys)
+		this.View.StatusBarSetText("Step: " index "/" NbKeys)
+        GuiControl, % this.View._hwnd ":+Range1-" NbKeys , % this.View.SliderKey._hwnd ; hijack library not working with sliders apparently
+		For key, value in this.Model.MasterTranslation.LanguageData[index]
+		{
+			this.CurrentKeyName := key
+			this.View.AddTranslationToEditorInput("Master", key, value)
+			this.View.AddTranslationToEditorInput("Current", key, this.Model.CurrentTranslation.LanguageData[index][key])
+			break
+		}
+		If (this.MasterModifications = True)
+		{
+			_MasterModifications := !_MasterModifications
+			Gui, Font, Normal s14
+			GuiControl, Font, TextMasterTranslationTitle
+			GuiControl,, TextMasterTranslationTitle, Master Translation
+			Gui, Font, Normal
+		}
+		If (this.CurrentModifications = True)
+		{
+			_CurrentModifications := !_CurrentModifications
+			Gui, Font, Normal s14
+			GuiControl, Font, TextCurrentTranslationTitle
+			GuiControl,, TextCurrentTranslationTitle, Current Translation
+			Gui, Font, Normal
+		}
+	}
 
     /*
         Menu
@@ -23,12 +60,12 @@ class Controller
     }
     button1Listener()
     {
-        this.model.aSimpleFunction()
-        this.view.ed1.text := this.model.aTextVariable
+        this.Model.aSimpleFunction()
+        this.View.ed1.text := this.Model.aTextVariable
     }
     BtnSave_Listener(id)
     {
-        this.model.SaveTranslationKey(id)
+        this.Model.SaveTranslationKey(id)
     }
 }
 

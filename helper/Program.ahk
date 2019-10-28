@@ -9,23 +9,31 @@ StringCaseSense On
 
 #SingleInstance Force
 
-progObj := new Program()
-progObj.main()
+Prog := new Program()
+Prog.Main()
 return
 
 #Include lib\CGui.ahk
+#Include lib\SB.ahk
 #Include src\Models\MainModel.ahk
 #Include src\Controllers\MainController.ahk
 #Include src\Views\MainView.ahk
 
 class Program
 {
-    main()
+    Initialize()
     {
         SetWorkingDir,% A_ScriptDir
-        this.view := new View()
-        this.model := new Model()
-        this.controller := new Controller(this.model, this.view)
-        this.view.showGui()
+		this.View := new View()
+		this.Model := new Model()
+		this.Controller := new Controller(this.Model, this.View)
+		this.View.showGui()
     }
+	
+	Main()
+	{
+        this.Initialize()
+
+        this.Controller.LoadGuiContent(1)
+	}
 }
