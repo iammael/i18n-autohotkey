@@ -14,7 +14,6 @@ progObj.main()
 return
 
 #Include lib\CGui.ahk
-#Include lib\Center.ahk
 #Include src\Models\MainModel.ahk
 #Include src\Controllers\MainController.ahk
 #Include src\Views\MainView.ahk
