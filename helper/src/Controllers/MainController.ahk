@@ -9,8 +9,6 @@ class Controller
 
     CurrentKey := 1
     CurrentKeyName := ""
-    MasterModifications := False
-    CurrentModifications := False
 
     __New( Model, View)
     {
@@ -32,22 +30,6 @@ class Controller
 			this.View.AddTranslationToEditorInput("Master", key, value)
 			this.View.AddTranslationToEditorInput("Current", key, this.Model.CurrentTranslation.LanguageData[index][key])
 			break
-		}
-		If (this.MasterModifications = True)
-		{
-			_MasterModifications := !_MasterModifications
-			Gui, Font, Normal s14
-			GuiControl, Font, TextMasterTranslationTitle
-			GuiControl,, TextMasterTranslationTitle, Master Translation
-			Gui, Font, Normal
-		}
-		If (this.CurrentModifications = True)
-		{
-			_CurrentModifications := !_CurrentModifications
-			Gui, Font, Normal s14
-			GuiControl, Font, TextCurrentTranslationTitle
-			GuiControl,, TextCurrentTranslationTitle, Current Translation
-			Gui, Font, Normal
 		}
 	}
 
@@ -126,6 +108,7 @@ SaveCurrentKeys:
     return
 #IfWinActive
 
+Esc::
 +F12::
 GuiClose:
 Quit:

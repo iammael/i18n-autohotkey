@@ -1,5 +1,8 @@
 ﻿class View extends CGui
 {
+    MasterHasModifications := False
+    CurrentHasModifications := False
+
     __New(aParams*){
 		global BorderState
 
@@ -58,6 +61,12 @@
     }
 
     AddControlsListeners(){
+
+        ;Edit fields
+        this.GuiControl("+g", this.EditMasterTranslation, this.EditMasterTranslation_OnChanged)
+        this.GuiControl("+g", this.EditCurrentTranslation, this.EditCurrentTranslation_OnChanged)
+
+        ;Save
         this.GuiControl("+g", this.BtnSaveMaster, this.BtnSaveMaster_OnClick)
         this.GuiControl("+g", this.BtnSaveCurrent, this.BtnSaveCurrent_OnClick)
     }
@@ -69,6 +78,45 @@
             this.GuiControl("Text", this.TextCurrentKey, key " 📋")
         this.GuiControl(, (id = "Master") ? this.EditMasterTranslation : this.EditCurrentTranslation, value)
         Gui, Submit, NoHide
+    }
+
+    /*
+        Style on modifications
+    */
+
+/*
+    GuiControlGet, title, , Text%id%TranslationTitle
+    Gui, Font, Italic s14
+    GuiControl, Font, Text%id%TranslationTitle
+    GuiControl,, Text%id%TranslationTitle, %title%*
+    Gui, Font, Normal
+    _%id%Modifications := !_%id%Modifications
+*/
+/*
+    HasModifications(id)
+    {
+        If (this[id "HasModifications"])
+            return
+        titleElement := this["Text" id "TranslationTitle"]
+        title := titleElement.value
+        Gui, Font, Italic s14
+        this.GuiControl("Font", titleElement)
+        this.GuiControl(, titleElement, title "*")
+        Gui, Font, Normal
+        this[id "HasModifications"] := True
+    }
+*/
+    ToggleModifications(id, hasModifications)
+    {
+        If (this[id "HasModifications"] = hasModifications)
+            return
+        titleElement := this["Text" id "TranslationTitle"]
+        title := titleElement.value
+        Gui, Font, % hasModifications ? "Italic s14" : "Normal s14"
+        this.GuiControl("Font", titleElement)
+        this.GuiControl(, titleElement, hasModifications ? title "*" : StrReplace(title, "*"))
+        Gui, Font, Normal
+        this[id "HasModifications"] := !this[id "HasModifications"]
     }
 
     /*
@@ -116,8 +164,24 @@
     }
 
     /* 
-        Controls 
+        EVENTS
     */
+
+    ; OnChanged
+
+    EditMasterTranslation_OnChanged(){
+        Gui, Submit, NoHide
+        this.ToggleModifications("Master", True)
+        Sleep 3000
+        this.ToggleModifications("Master", False)
+    }
+
+    EditCurrentTranslation_OnChanged(){
+        Gui, Submit, NoHide
+        this.ToggleModifications("Current", True)
+    }
+
+    ; OnClick
 
     BtnSaveMaster_OnClick() {
         this.Controller.BtnSave_Listener("Master")
