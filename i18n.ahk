@@ -17,19 +17,24 @@ Class i18n {
             ExitApp -1
         }
     }
+
+    ReplaceArgs(textToParse, Byref var, ByRef index) 
+    {
+        return StrReplace(textToParse, "{" . index . "}", var)
+    }
 }
 
 Translate(key, args := 0)
 {
-    translatedText := GetValueFromIni(key, i18nService.LanguageFile)
+    translatedText := GetValueFromIni(key, i18n.LanguageFile)
     ;Deal with error
     If !translatedText
     {
-        If i18nService.DevMode {
+        If i18n.DevMode {
             Loop {
                 If translatedText
                     break
-                MsgBox, % 16+2, Dev Mode, % "File " i18nService.LanguageFile " is missing string for key {" key "}.`nPress Ignore to continue anyway."
+                MsgBox, % 16+2, Dev Mode, % "File " i18n.LanguageFile " is missing string for key {" key "}.`nPress Ignore to continue anyway."
                 IfMsgBox, Abort
                     ExitApp
                 IfMsgBox, Retry
@@ -45,7 +50,7 @@ Translate(key, args := 0)
     ;check and replace args ({1}, {2}, ...)
     If args
         Loop % args.MaxIndex()
-            translatedText := TranslateReplaceArgs(translatedText, args[A_Index], A_Index)
+            translatedText := i18n.ReplaceArgs(translatedText, args[A_Index], A_Index)
     return translatedText
 }
 
@@ -70,9 +75,3 @@ GetValueFromIni(ByRef key, ByRef languageFile)
     }
 }
 
-TranslateReplaceArgs(textToParse, Byref var, ByRef index)
-{
-    If InStr(textToParse, "{" . index . "}")
-        return StrReplace(textToParse, "{" . index . "}", var)
-    return textToParse
-}

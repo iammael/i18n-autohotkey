@@ -31,7 +31,7 @@ ButtonSwitchLanguage:
         lang := "fr-FR"
     Else
         lang := "en-US"
-    i18nService := New i18n("..\i18n-data", lang, True)
+    i18nService := New i18n("i18n", lang, True)
     GuiControl, Text, TextGui, % Translate("TextGui")
     toggled := !toggled
 return
@@ -52,6 +52,16 @@ ButtonDemo:
     ; To Do
     ; #4 - Example complex MsgBox
     MsgBox,     48, % "#4 " Translate("ComplexTitle", [GetVar("TitleApp")]), % Translate("Complex", [colors[3], colors[1]])
+return
+
+ButtonSwitchLanguage:
+    If !toggled
+        lang := "fr-FR"
+    Else
+        lang := "en-US"
+    i18n := New i18n("i18n", lang, True)
+    GuiControl, Text, TextGui, % Translate("TextGui")
+    toggled := !toggled
 return
 
 F12::

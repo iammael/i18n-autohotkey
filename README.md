@@ -25,9 +25,9 @@ Read the instructions or check the sample project below.
   - All keys must be declared in the [Strings] section.
   - You can add dynamic arguments in the key value with {1}, {2}, etc...
 
-- Declare a new global object **named i18nService**.
+- Declare a new global object **named i18n**.
 
-  - `Global i18nService := New i18n(LanguageFolder, LanguageFile, [DevMode])`
+  - `i18n := New i18n(LanguageFolder, LanguageFile, [DevMode])`
   - If *DevMode* is set to *True*, it will trigger some alerts for missing strings when you execute your program.
 
 - Whenever you want to internationalize a string, make a call to function Translate.
@@ -50,14 +50,14 @@ Here's an example of a working script featuring i18n (it will work given you hav
 
 MyAppName := "Sample Project"
 
-Global i18nService := New i18n("i18n", "en-US")
+i18n := New i18n("i18n", "en-US")
 
 MsgBox % Translate("HelloWorld")
 MsgBox % Translate("Greetings", [MyAppName])
 
 ; You can dynamically change the language without reloading the program
 
-i18nService := New i18n("i18n", "fr-FR")
+i18n := New i18n("i18n", "fr-FR")
 
 MsgBox % Translate("HelloWorld")
 MsgBox % Translate("Greetings", [MyAppName])
@@ -72,7 +72,7 @@ Here is an example of a project using a GUI, multiline and imbricated translatio
 ```AutoHotKey
 #Include lib\i18n.ahk
 
-Global i18nService := New i18n("i18n", "en-US", True)
+i18n := New i18n("i18n", "en-US", True)
 
 Gui, Add, Button,   ,Switch Language
 Gui, Add, Text,     vTextGui w150,% Translate("TextGui")
@@ -92,7 +92,7 @@ ButtonSwitchLanguage:
         lang := "fr-FR"
     Else
         lang := "en-US"
-    i18nService := New i18n("i18n", lang, True)
+    i18n := New i18n("i18n", lang, True)
     GuiControl, Text, TextGui, % Translate("TextGui")
     toggled := !toggled
 return
