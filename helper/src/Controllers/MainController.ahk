@@ -37,7 +37,6 @@ class Controller
     LoadContentOnGui(index)
 	{
         NbKeys := this.Model.NbKeys
-
 		this.View.StatusBarSetProgress(index, NbKeys)
 		this.View.StatusBarSetText("Step: " index "/" NbKeys)
         GuiControl, % this.View._hwnd ":+Range1-" NbKeys , % this.View.SliderKey._hwnd ; hijack library not working with sliders apparently
@@ -48,13 +47,7 @@ class Controller
         this.View.SetEditorContent("Current", this.Model.CurrentTranslation.GetValue(index))
 	}
 
-    OpenSettingsView(){
-        this.View.OpenSettingsView()
-    }
 
-    /*
-        Menu
-    */
 
     BtnSave_Listener(id, value)
     {
@@ -62,6 +55,25 @@ class Controller
         this.View.ToggleModifications("Master", False)
         this.View.ToggleModifications("Current", False)
     }
+
+    /* 
+        Settings 
+    */
+
+    OpenSettingsView(){
+        this.View.OpenSettingsView()
+    }
+
+    BrowseSources(){
+        FileSelectFolder, selectedFolder,,,Browse for your project directory.
+        IniWrite, %selectedFolder%, % this.Model.PathIniSettings, Path, Sources
+    }
+
+    BrowseTranslations(){
+        FileSelectFolder, selectedFolder,,,Browse for your translations directory.
+        IniWrite, %selectedFolder%, % this.Model.PathIniSettings, Path, Translations
+    }
+
 }
 
 /*

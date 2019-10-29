@@ -18,7 +18,6 @@ return
 #Include src\Models\MainModel.ahk
 #Include src\Controllers\MainController.ahk
 #Include src\Views\MainView.ahk
-;#Include src\Views\SettingsView.ahk
 
 class Program
 {
@@ -26,7 +25,6 @@ class Program
     {
         SetWorkingDir,% A_ScriptDir
 		this.View := new View()
-        ;this.SettingsView := new SettingsView()
 		this.Model := new Model()
 		this.Controller := new Controller(this.Model, this.View)
 		this.View.showGui()
@@ -40,6 +38,6 @@ class Program
             this.Controller.CurrentKey := 1
         Else
             MsgBox, Didn't find any translation calls in source code.
-        ;this.Controller.OpenSettingsView()
+        this.Controller.OpenSettingsView()
 	}
 }

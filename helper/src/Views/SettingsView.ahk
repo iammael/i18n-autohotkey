@@ -27,12 +27,12 @@ Class SettingsView extends CGui
         ;Sources
         this.Gui("Add", "Text", "ys+20 xs+10 w60", "Sources")
         this.EditPathSources := this.Gui("Add", "Edit", "x+10 w350")
-        this.BtnPathSources := this.Gui("Add", "Button", "x+10 w50", "Browse")
+        this.BtnBrowseSources := this.Gui("Add", "Button", "x+10 w50", "Browse")
 
         ;Translation
         this.Gui("Add", "Text", "y+10 xs+10 w60", "Translations")
         this.EditPathTranslations := this.Gui("Add", "Edit", "x+10 w350")
-        this.BtnPathSources := this.Gui("Add", "Button", "x+10 w50", "Browse")
+        this.BtnBrowseTranslations := this.Gui("Add", "Button", "x+10 w50", "Browse")
 
         ;TRANSLATIONS
         this.Gui("Add", "GroupBox", "y+10 x10 h100 w500", "Translations")
@@ -61,6 +61,15 @@ Class SettingsView extends CGui
     }
 
     AddControlsListeners() {
+        this.GuiControl("+g", this.BtnBrowseSources, this.BtnBrowseSources_OnClick)
+        this.GuiControl("+g", this.BtnBrowseTranslations, this.BtnBrowseTranslations_OnClick)
+    }
 
+    BtnBrowseSources_OnClick() {
+        this._parent.Controller.BrowseSources()
+    }
+
+    BtnBrowseTranslations_OnClick() {
+        this._parent.Controller.BrowseTranslations()
     }
 }

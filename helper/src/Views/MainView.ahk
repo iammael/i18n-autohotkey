@@ -78,7 +78,7 @@
     }
 
     OpenSettingsView(){
-        this.SettingsView := new this.SettingsView(this, "+Border +ToolWindow +AlwaysOnTop")
+        this.SettingsView := new this.SettingsView(this, "+Border +ToolWindow")
 		this.SettingsView.ShowGui()
     }
 
