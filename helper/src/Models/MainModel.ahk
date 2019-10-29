@@ -15,7 +15,6 @@ class Model
 
         ;Ini write
         value := StrSplit(value, "`n")
-        msgbox, % value[1]
         this.DeleteKey(obj.file, obj.LanguageDataList[index].Key)
         IniWrite, % value[1], % obj.file, Strings, % obj.LanguageDataList[index].Key
         

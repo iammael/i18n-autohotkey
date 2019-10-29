@@ -48,6 +48,10 @@ class Controller
         this.View.SetEditorContent("Current", this.Model.CurrentTranslation.GetValue(index))
 	}
 
+    OpenSettingsView(){
+        this.View.OpenSettingsView()
+    }
+
     /*
         Menu
     */
@@ -68,34 +72,8 @@ GetKeyCodeInClipboard:
     Gui, Submit, NoHide
     Clipboard := "Translate(""" _CurrentKeyName """)"
     return
-
-ButtonPreview:
-    MsgBox, 32, Preview, % (A_GuiControl = "PreviewMaster") ? EditMasterTranslation : EditCurrentTranslation
-    return
-
-SliderUpdateKey:
-    If (CheckForModifications())
-        LoadContentOnGui(SliderKey)
-    return
-
-NextKey:
-    If (_CurrentKey < _NbKeys)
-        If (CheckForModifications())
-            LoadContentOnGui(++_CurrentKey)
-    return
-
-PreviousKey:
-    If (_CurrentKey > 1)
-        If (CheckForModifications())
-            LoadContentOnGui(--_CurrentKey)
-    return
-
-ButtonSave:
-    Gui, Submit, NoHide
-    id := (A_GuiControl = "SaveMaster") ? "Master" : "Current"
-    SaveTranslation(id)
-    return
 */
+
 VisitGitHub:
     Run "https://github.com/iammael/Translation-AHK"
     return
@@ -112,25 +90,28 @@ Reload:
 
 ;Need to be rewritten with Hotkey function
 ^Left::
-    MenuPreviousKey:
+MenuPreviousKey:
     Prog.View.ChangeOnScreenKey("-1")
     return
 
 ;Need to be rewritten with Hotkey function
 ^Right::
-    MenuNextKey:
+MenuNextKey:
     Prog.View.ChangeOnScreenKey("+1")
     return
 
 ^S::
 SaveCurrentKeys:
-    ;SaveTranslation("Master")
-    ;SaveTranslation("Current")
+     Prog.View.BtnSaveMaster_OnClick()
+     Prog.View.BtnSaveCurrent_OnClick()
+    return
+
+MenuSettings:
+    Prog.Controller.OpenSettingsView()
     return
 #IfWinActive
 
 Esc::
 +F12::
-GuiClose:
 Quit:
     ExitApp

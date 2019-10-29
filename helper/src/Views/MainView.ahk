@@ -1,5 +1,7 @@
 ﻿class View extends CGui
 {
+    #Include src\Views\SettingsView.ahk
+
     MasterHasModifications := False
     CurrentHasModifications := False
 
@@ -75,6 +77,11 @@
         this.GuiControl("+g", this.BtnSaveCurrent, this.BtnSaveCurrent_OnClick)
     }
 
+    OpenSettingsView(){
+        this.SettingsView := new this.SettingsView(this, "+Border +ToolWindow +AlwaysOnTop")
+		this.SettingsView.ShowGui()
+    }
+
     SetTextKeyNameContent(key) {
         this.GuiControl("Text", this.TextKeyName, key " 📋")
     }
@@ -109,13 +116,15 @@
 
     loadMenuBar()
     {
+        Menu, Tray, Icon,       resources\icon.ico, 1, 1
+
         ;File
-        Menu, FileMenu, Add,                Reload`tCtrl+R, Reload
-        Menu, FileMenu, Add,
         Menu, FileMenu, Add,                Save current keys`tCtrl+S, SaveCurrentKeys
         Menu, FileMenu, Add,                Previous Key`tCtrl+←, MenuPreviousKey
         Menu, FileMenu, Add,                Next Key`tCtrl+→, MenuNextKey
         Menu, FileMenu, Add,
+        Menu, FileMenu, Add,                Settings...,MenuSettings
+        Menu, FileMenu, Add,                Reload`tCtrl+R, Reload
         Menu, FileMenu, Add,                Quit`tShift+F12, Quit
         Menu, MyMenuBar, Add,               File, :FileMenu
 
@@ -152,8 +161,12 @@
     }
 
     ChangeOnScreenKey(value) {
+        If (this.CheckForModifications())
+            return
         this.Controller.CurrentKey := value
         this.GuiControl(, this.SliderKey, this.Controller.CurrentKey)
+        this.ToggleModifications("Master", False)
+        this.ToggleModifications("Current", False)
     }
 
     /* 
@@ -161,7 +174,6 @@
     */
 
     ; Navigation
-    ; NEEDS A CHECK FOR MODIFICATIONS
 
     SliderKey_OnChange(){
         this.ChangeOnScreenKey(this.SliderKey.value)
@@ -187,6 +199,17 @@
         this.ToggleModifications("Current", True)
     }
 
+    CheckForModifications()
+    {
+        If (this.MasterHasModifications || this.CurrentHasModifications)
+        {
+            MsgBox, % 49+4096, Alert, % "You have some unsaved edits for this key. Press Ok to discard them."
+            IfMsgBox, Cancel
+                Return True
+        }
+        Return False
+    }
+
     ; Save
 
     BtnSaveMaster_OnClick() {
@@ -200,5 +223,4 @@
     {
         this.Controller := Controller
     }
-    
 }
