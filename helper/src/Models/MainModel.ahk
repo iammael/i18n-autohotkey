@@ -7,10 +7,40 @@ class Model
     PathIniSettings := "helper-settings.ini"
     NbKeys := 0
     
-    SaveTranslationKey(id, currentKey)
+    SaveTranslationKey(id, index, value)
     {
-        ;msgbox, % this[id "Translation"].LanguageDataList[currentKey][1]
-        ;IniWrite, % this[id "Translation"].LanguageDataList[currentKey], % _MasterTranslation.file, Strings, % _CurrentKeyName
+        obj := this[id "Translation"] ; LanguageDataList[currentKey].Value
+
+        obj.LanguageDataList[index].Value := value
+
+        ;Ini write
+        value := StrSplit(value, "`n")
+        msgbox, % value[1]
+        this.DeleteKey(obj.file, obj.LanguageDataList[index].Key)
+        IniWrite, % value[1], % obj.file, Strings, % obj.LanguageDataList[index].Key
+        
+        ;Write multiline
+        i := 2
+        Loop {
+            If !value[i]
+                break
+            IniWrite, % value[i], % obj.file, Strings, % obj.LanguageDataList[index].Key . i
+            i++
+        }
+    }
+
+    DeleteKey(filename, keyName)
+    {
+        IniDelete, %filename%, Strings, %keyName%
+        ;Multiline
+        i := 2
+        Loop {
+            IniRead, output, %filename%, Strings, %keyName%%i%, %A_Space%
+            If !output
+                break
+            IniDelete, %filename%, Strings, %keyName%%i%
+            i++
+        }
     }
 
     Commands := []

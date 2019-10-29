@@ -6,10 +6,8 @@ class Controller
 {
     Model := ""
     View := ""
-
-    ;CurrentKey := 1
     CurrentKeyName := ""
-    HasLoaded := False
+    ;HasLoaded := False
 
     __New( Model, View)
     {
@@ -54,9 +52,11 @@ class Controller
         Menu
     */
 
-    BtnSave_Listener(id)
+    BtnSave_Listener(id, value)
     {
-        this.Model.SaveTranslationKey(id, this.CurrentKey)
+        this.Model.SaveTranslationKey(id, this.CurrentKey, value)
+        this.View.ToggleModifications("Master", False)
+        this.View.ToggleModifications("Current", False)
     }
 }
 

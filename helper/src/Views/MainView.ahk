@@ -161,6 +161,7 @@
     */
 
     ; Navigation
+    ; NEEDS A CHECK FOR MODIFICATIONS
 
     SliderKey_OnChange(){
         this.ChangeOnScreenKey(this.SliderKey.value)
@@ -189,10 +190,10 @@
     ; Save
 
     BtnSaveMaster_OnClick() {
-        this.Controller.BtnSave_Listener("Master")
+        this.Controller.BtnSave_Listener("Master", this.EditMasterTranslation.value)
     }
     BtnSaveCurrent_OnClick() {
-        this.Controller.BtnSave_Listener("Current")
+        this.Controller.BtnSave_Listener("Current", this.EditCurrentTranslation.value)
     }
 
     addListener(Controller)
