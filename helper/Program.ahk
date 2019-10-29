@@ -34,6 +34,9 @@ class Program
 	{
         this.Initialize()
 
-        this.Controller.LoadGuiContent(1)
+        If (this.Model.MasterTranslation.LanguageData.MaxIndex() > 0)
+            this.Controller.CurrentKey := 1
+        Else
+            MsgBox, Didn't find any translation calls in source code.
 	}
 }

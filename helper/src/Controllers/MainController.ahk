@@ -7,8 +7,9 @@ class Controller
     Model := ""
     View := ""
 
-    CurrentKey := 1
+    ;CurrentKey := 1
     CurrentKeyName := ""
+    HasLoaded := False
 
     __New( Model, View)
     {
@@ -17,7 +18,25 @@ class Controller
         this.View.AddListener(this)
     }
 
-    LoadGuiContent(index)
+    CurrentKey {
+        get { 
+            return this.stored_CurrentKey
+        }
+        set {
+            If (InStr(value, "+"))
+                finalValue := this.CurrentKey + StrReplace(value, "+")
+            Else If (InStr(value, "-"))
+                finalValue := this.CurrentKey - StrReplace(value, "-")
+            Else
+                finalValue := value
+            If (finalValue < 1 || finalValue > this.Model.NbKeys)
+                return
+            this.LoadContentOnGui(finalValue)
+            return this.stored_CurrentKey := finalValue
+        }
+    }
+
+    LoadContentOnGui(index)
 	{
         NbKeys := this.Model.NbKeys
 
@@ -66,19 +85,19 @@ ButtonPreview:
 
 SliderUpdateKey:
     If (CheckForModifications())
-        LoadGuiContent(SliderKey)
+        LoadContentOnGui(SliderKey)
     return
 
 NextKey:
     If (_CurrentKey < _NbKeys)
         If (CheckForModifications())
-            LoadGuiContent(++_CurrentKey)
+            LoadContentOnGui(++_CurrentKey)
     return
 
 PreviousKey:
     If (_CurrentKey > 1)
         If (CheckForModifications())
-            LoadGuiContent(--_CurrentKey)
+            LoadContentOnGui(--_CurrentKey)
     return
 
 ButtonSave:
@@ -99,6 +118,18 @@ VisitGitHub:
 ^R::
 Reload:
     Reload
+    return
+
+;Need to be rewritten with Hotkey function
+^Left::
+    MenuPreviousKey:
+    Prog.View.ChangeOnScreenKey("-1")
+    return
+
+;Need to be rewritten with Hotkey function
+^Right::
+    MenuNextKey:
+    Prog.View.ChangeOnScreenKey("+1")
     return
 
 ^S::

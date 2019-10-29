@@ -34,13 +34,12 @@
     {
         global
 
-        this.BtnPreviousKey :=              this.Gui("Add", "Picture", "x" this.GUI_WIDTH / 2.3, "resources\arrow-previous.png")
+        this.BtnPreviousKey :=              this.Gui("Add", "Button", "x" this.GUI_WIDTH / 2.3, "←")
         this.SliderKey :=                   this.Gui("Add", "Slider", "x+10", 0)
-        this.BtnNextKey :=                  this.Gui("Add", "Picture", "x+10", "resources\arrow-next.png")
+        this.BtnNextKey :=                  this.Gui("Add", "Button", "x+10", "→")
         Gui, Font,                          Bold
         this.TextCurrentKey :=              this.Gui("Add", "Text", "xm y+10 Center w" this.GUI_WIDTH, "No translation key found")
         Gui, Font,                          Normal
-
 
         ;Editor dynamic
         columnWidth := 580
@@ -63,8 +62,13 @@
     AddControlsListeners(){
 
         ;Edit fields
-        this.GuiControl("+g", this.EditMasterTranslation, this.EditMasterTranslation_OnChanged)
-        this.GuiControl("+g", this.EditCurrentTranslation, this.EditCurrentTranslation_OnChanged)
+        this.GuiControl("+g", this.EditMasterTranslation, this.EditMasterTranslation_OnChange)
+        this.GuiControl("+g", this.EditCurrentTranslation, this.EditCurrentTranslation_OnChange)
+
+        ;Update current key
+        this.GuiControl("+g", this.SliderKey, this.SliderKey_OnChange)     
+        this.GuiControl("+g", this.BtnPreviousKey, this.BtnPreviousKey_OnClick)
+        this.GuiControl("+g", this.BtnNextKey, this.BtnNextKey_OnClick)
 
         ;Save
         this.GuiControl("+g", this.BtnSaveMaster, this.BtnSaveMaster_OnClick)
@@ -84,28 +88,6 @@
         Style on modifications
     */
 
-/*
-    GuiControlGet, title, , Text%id%TranslationTitle
-    Gui, Font, Italic s14
-    GuiControl, Font, Text%id%TranslationTitle
-    GuiControl,, Text%id%TranslationTitle, %title%*
-    Gui, Font, Normal
-    _%id%Modifications := !_%id%Modifications
-*/
-/*
-    HasModifications(id)
-    {
-        If (this[id "HasModifications"])
-            return
-        titleElement := this["Text" id "TranslationTitle"]
-        title := titleElement.value
-        Gui, Font, Italic s14
-        this.GuiControl("Font", titleElement)
-        this.GuiControl(, titleElement, title "*")
-        Gui, Font, Normal
-        this[id "HasModifications"] := True
-    }
-*/
     ToggleModifications(id, hasModifications)
     {
         If (this[id "HasModifications"] = hasModifications)
@@ -126,8 +108,12 @@
     loadMenuBar()
     {
         ;File
-        Menu, FileMenu, Add,                Reload`tCtrl+R,Reload
-        Menu, FileMenu, Add,                Save current keys`tCtrl+S,SaveCurrentKeys
+        Menu, FileMenu, Add,                Reload`tCtrl+R, Reload
+        Menu, FileMenu, Add,
+        Menu, FileMenu, Add,                Save current keys`tCtrl+S, SaveCurrentKeys
+        Menu, FileMenu, Add,                Previous Key`tCtrl+←, MenuPreviousKey
+        Menu, FileMenu, Add,                Next Key`tCtrl+→, MenuNextKey
+        Menu, FileMenu, Add,
         Menu, FileMenu, Add,                Quit`tShift+F12, Quit
         Menu, MyMenuBar, Add,               File, :FileMenu
 
@@ -163,25 +149,42 @@
         SB_SetText(value, 2)
     }
 
+    ChangeOnScreenKey(value) {
+        this.Controller.CurrentKey := value
+        this.GuiControl(, this.SliderKey, this.Controller.CurrentKey)
+    }
+
     /* 
         EVENTS
     */
 
-    ; OnChanged
+    ; Navigation
 
-    EditMasterTranslation_OnChanged(){
-        Gui, Submit, NoHide
-        this.ToggleModifications("Master", True)
-        Sleep 3000
-        this.ToggleModifications("Master", False)
+    SliderKey_OnChange(){
+        this.ChangeOnScreenKey(this.SliderKey.value)
     }
 
-    EditCurrentTranslation_OnChanged(){
+    BtnPreviousKey_OnClick() {
+        this.ChangeOnScreenKey("-1")
+    }
+
+    BtnNextKey_OnClick() {
+        this.ChangeOnScreenKey("+1")
+    }
+
+    ; OnChange to edit style on modifications
+
+    EditMasterTranslation_OnChange(){
+        Gui, Submit, NoHide
+        this.ToggleModifications("Master", True)
+    }
+
+    EditCurrentTranslation_OnChange(){
         Gui, Submit, NoHide
         this.ToggleModifications("Current", True)
     }
 
-    ; OnClick
+    ; Save
 
     BtnSaveMaster_OnClick() {
         this.Controller.BtnSave_Listener("Master")
