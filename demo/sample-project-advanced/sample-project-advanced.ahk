@@ -7,7 +7,7 @@
 
 #Include ..\..\i18n.ahk
 
-Global i18nService := New i18n("..\i18n-data", "en-US", True)
+Global i18n := New i18n("..\i18n-data", "en-US", True)
 
 /*
     Gui
@@ -25,16 +25,6 @@ GetVar(var){
     global
     return %var%
 }
-
-ButtonSwitchLanguage:
-    If !toggled
-        lang := "fr-FR"
-    Else
-        lang := "en-US"
-    i18nService := New i18n("i18n", lang, True)
-    GuiControl, Text, TextGui, % Translate("TextGui")
-    toggled := !toggled
-return
 
 ButtonDemo:
     ; #1 - Basic translation
