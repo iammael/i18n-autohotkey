@@ -38,7 +38,7 @@
         this.SliderKey :=                   this.Gui("Add", "Slider", "x+10", 0)
         this.BtnNextKey :=                  this.Gui("Add", "Button", "x+10", "→")
         Gui, Font,                          Bold
-        this.TextCurrentKey :=              this.Gui("Add", "Text", "xm y+10 Center w" this.GUI_WIDTH, "No translation key found")
+        this.TextKeyName :=              this.Gui("Add", "Text", "xm y+10 Center w" this.GUI_WIDTH, "No translation key found")
         Gui, Font,                          Normal
 
         ;Editor dynamic
@@ -75,11 +75,13 @@
         this.GuiControl("+g", this.BtnSaveCurrent, this.BtnSaveCurrent_OnClick)
     }
 
+    SetTextKeyNameContent(key) {
+        this.GuiControl("Text", this.TextKeyName, key " 📋")
+    }
+
     ;To be revised
-    AddTranslationToEditorInput(id, key, value)
-    {
-        If (id = "Master")
-            this.GuiControl("Text", this.TextCurrentKey, key " 📋")
+    SetEditorContent(id, value)
+    {            
         this.GuiControl(, (id = "Master") ? this.EditMasterTranslation : this.EditCurrentTranslation, value)
         Gui, Submit, NoHide
     }

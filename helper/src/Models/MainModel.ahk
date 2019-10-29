@@ -7,9 +7,10 @@ class Model
     PathIniSettings := "helper-settings.ini"
     NbKeys := 0
     
-    SaveTranslationKey(id)
+    SaveTranslationKey(id, currentKey)
     {
-        MsgBox, % "Model :)! Id=" id
+        ;msgbox, % this[id "Translation"].LanguageDataList[currentKey][1]
+        ;IniWrite, % this[id "Translation"].LanguageDataList[currentKey], % _MasterTranslation.file, Strings, % _CurrentKeyName
     }
 
     Commands := []
@@ -18,7 +19,7 @@ class Model
         this.Commands := []
         this.GetSettingsFromIni()
         this.ParseSourceCode()
-        this.NbKeys := this.MasterTranslation.LanguageData.MaxIndex()
+        this.NbKeys := this.MasterTranslation.LanguageDataList.MaxIndex()
     }
 
     GetSettingsFromIni()
@@ -51,16 +52,18 @@ class Model
             If !isExcluded
                 Loop, Read, %A_LoopFileFullPath%
                 {
+                    this.Commands := []
                     this.ParseLine(A_LoopReadLine)
                     Loop % this.Commands.MaxIndex()
                     {
-                        currentKey := this.Commands[A_Index].Key
-                        If this.MasterTranslation.IsAlreadyInList(currentKey)
+                        currentKeyName := this.Commands[A_Index].Key
+                        If this.MasterTranslation.IsAlreadyInList(currentKeyName)
                             break
-                        this.MasterTranslation.LanguageData[i] := Object(currentKey, this.RetrieveTranslation(this.MasterTranslation, currentKey))
-                        this.CurrentTranslation.LanguageData[i++] := Object(currentKey, this.RetrieveTranslation(this.CurrentTranslation, currentKey))
+                        this.MasterTranslation.AddNewLanguageData(i, currentKeyName, this.RetrieveTranslation(this.MasterTranslation.File, currentKeyName))
+                        this.CurrentTranslation.AddNewLanguageData(i, currentKeyName, this.RetrieveTranslation(this.CurrentTranslation.File, currentKeyName))
+                        i++
                     }
-                }   
+                }
         }
         return
     }
@@ -106,56 +109,78 @@ class Model
         }
     }
 
-    ;To be revised
-    RetrieveTranslation(Byref obj, key)
+    ; Get translation from INI
+    RetrieveTranslation(filename, key)
     {
-        IniRead, readValue, % obj.file, Strings, %key%, %A_Space%
-
+        IniRead, readValue, %filename%, Strings, %key%, %A_Space%
         ;Check for multiline message
         translationValue := readValue
         i := 2
         Loop {
-            IniRead, readValue, % obj.file, Strings, %key%%i%, %A_Space%
+            IniRead, readValue, %filename%, Strings, %key%%i%, %A_Space%
             If !readValue
                 return translationValue
             Else
                 translationValue := translationValue . "`n" . readValue
             i++
-            
         }
+        
         return translationValue
     }
 
     Class Translation 
     {
         File := ""
-        LanguageData := [] ;contains keys and values of a translation
+        LanguageDataList := []
+
+        GetKey(index) {
+            return this.LanguageDataList[index].Key
+        }
+
+        GetValue(index) {
+            return this.LanguageDataList[index].Value
+        }
 
         __New(File := "") 
         {
             this.File := File
+            this.LanguageDataList := []
         }
 
         DebugPrint()
         {
             i := 1
-            Loop % this.LanguageData.MaxIndex()
-                For key, value in this.LanguageData[A_Index]
-                    msgbox % this.LanguageData[i++][key]
+            Loop, % this.LanguageDataList.MaxIndex()
+                MsgBox, % "Value for " this.LanguageDataList[A_Index].Key " is " this.LanguageDataList[A_Index].Value
+        }
+
+        AddNewLanguageData(index, key, value){
+            this.LanguageDataList[index] := New this.LanguageData(key, value)
         }
 
         IsAlreadyInList(currentKey)
         {
-            Loop, % this.LanguageData.MaxIndex()
-                For key, value in this.LanguageData[A_Index]
-                    If (key = currentKey)
-                        return True
+            Loop, % this.LanguageDataList.MaxIndex()
+                If (this.LanguageDataList[A_Index].Key = currentKey)
+                    return True
             return False
+        }
+
+        Class LanguageData ; contains data for a key and it's corresponding value
+        {
+            Key := ""
+            Value := ""
+
+            __New(key, value){
+                this.Key := key
+                this.Value := value
+            }
         }
     }
 }
 
 ;To be revised
+;To be moved inside model
 Class Command {
     FullLine := ""
     Args := []

@@ -43,30 +43,20 @@ class Controller
 		this.View.StatusBarSetProgress(index, NbKeys)
 		this.View.StatusBarSetText("Step: " index "/" NbKeys)
         GuiControl, % this.View._hwnd ":+Range1-" NbKeys , % this.View.SliderKey._hwnd ; hijack library not working with sliders apparently
-		For key, value in this.Model.MasterTranslation.LanguageData[index]
-		{
-			this.CurrentKeyName := key
-			this.View.AddTranslationToEditorInput("Master", key, value)
-			this.View.AddTranslationToEditorInput("Current", key, this.Model.CurrentTranslation.LanguageData[index][key])
-			break
-		}
+
+        this.CurrentKeyName := this.Model.MasterTranslation.GetKey(index)
+        this.View.SetTextKeyNameContent(this.CurrentKeyName)
+        this.View.SetEditorContent("Master", this.Model.MasterTranslation.GetValue(index))
+        this.View.SetEditorContent("Current", this.Model.CurrentTranslation.GetValue(index))
 	}
 
     /*
         Menu
     */
 
-    MenuReloadListener(){
-        Reload
-    }
-    button1Listener()
-    {
-        this.Model.aSimpleFunction()
-        this.View.ed1.text := this.Model.aTextVariable
-    }
     BtnSave_Listener(id)
     {
-        this.Model.SaveTranslationKey(id)
+        this.Model.SaveTranslationKey(id, this.CurrentKey)
     }
 }
 
