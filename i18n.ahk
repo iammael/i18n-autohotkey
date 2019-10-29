@@ -24,7 +24,7 @@ Class i18n {
     }
 }
 
-Translate(key, args := 0)
+Translate(key, args*)
 {
     translatedText := GetValueFromIni(key, i18n.LanguageFile)
     ;Deal with error
@@ -48,7 +48,6 @@ Translate(key, args := 0)
     }
 
     ;check and replace args ({1}, {2}, ...)
-    If args
         Loop % args.MaxIndex()
             translatedText := i18n.ReplaceArgs(translatedText, args[A_Index], A_Index)
     return translatedText
